@@ -46,7 +46,7 @@ const Orders = () => {
     }
     setSubmittingReview(order._id);
     try {
-      await api.post(`/reviews/${order.restaurant?._id}`, {
+      await api.post('/api/reviews/' + order.restaurant?._id, {
         rating: review.rating,
         comment: review.comment || '',
       });
@@ -97,7 +97,7 @@ const Orders = () => {
                   <h2 className="text-lg font-bold text-gray-800">{order.restaurant?.name}</h2>
                   <p className="text-gray-400 text-sm">{new Date(order.createdAt).toLocaleString()}</p>
                 </div>
-                <span className={`text-sm font-semibold px-3 py-1 rounded-full ${statusColor(order.status)}`}>
+                <span className={'text-sm font-semibold px-3 py-1 rounded-full ' + statusColor(order.status)}>
                   {order.status.replace('_', ' ').toUpperCase()}
                 </span>
               </div>
@@ -118,13 +118,13 @@ const Orders = () => {
 
               <div className="mt-2 text-sm text-gray-500">
                 Payment: {order.paymentMethod.toUpperCase()} •
-                {order.isPaid ? ' ✅ Paid' : ' ⏳ Unpaid'}
+                {order.isPaid ? ' Paid' : ' Unpaid'}
               </div>
 
               {order.status === 'delivered' && (
                 <div className="mt-4 border-t pt-4">
                   {reviewForm[order._id]?.submitted ? (
-                    <p className="text-green-500 text-sm font-medium">✅ Review submitted!</p>
+                    <p className="text-green-500 text-sm font-medium">Review submitted!</p>
                   ) : (
                     <div>
                       <p className="text-sm font-semibold text-gray-700 mb-2">Rate your experience:</p>
@@ -133,11 +133,7 @@ const Orders = () => {
                           <button
                             key={star}
                             onClick={() => handleReviewChange(order._id, 'rating', star)}
-                            className={`text-2xl transition ${
-                              reviewForm[order._id]?.rating >= star
-                                ? 'text-yellow-400'
-                                : 'text-gray-300'
-                            }`}
+                            className={'text-2xl transition ' + (reviewForm[order._id]?.rating >= star ? 'text-yellow-400' : 'text-gray-300')}
                           >
                             ★
                           </button>

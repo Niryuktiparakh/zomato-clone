@@ -8,7 +8,7 @@ export const CartProvider = ({ children }) => {
 
   const fetchCart = async () => {
     try {
-      const res = await api.get('/cart');
+      const res = await api.get('/api/cart');
       setCart(res.data);
     } catch {
       setCart(null);
@@ -16,12 +16,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (menuItemId, quantity = 1) => {
-    const res = await api.post('/cart', { menuItemId, quantity });
+    const res = await api.post('/api/cart', { menuItemId, quantity });
     setCart(res.data);
   };
 
   const clearCart = async () => {
-    await api.delete('/cart/clear');
+    await api.delete('/api/cart/clear');
     setCart(null);
   };
 

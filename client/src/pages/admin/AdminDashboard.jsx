@@ -6,11 +6,7 @@ import api from '../../services/api';
 const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    users: 0,
-    restaurants: 0,
-    orders: 0,
-  });
+  const [stats, setStats] = useState({ users: 0, restaurants: 0, orders: 0 });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,9 +18,9 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const [usersRes, restaurantsRes, ordersRes] = await Promise.all([
-          api.get('/admin/users'),
-          api.get('/admin/restaurants'),
-          api.get('/admin/orders'),
+          api.get('/api/admin/users'),
+          api.get('/api/admin/restaurants'),
+          api.get('/api/admin/orders'),
         ]);
         setStats({
           users: usersRes.data.length,
@@ -64,30 +60,21 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-xl shadow p-6 text-center">
           <p className="text-4xl font-bold text-red-500">{stats.users}</p>
           <p className="text-gray-600 mt-1 font-medium">Total Users</p>
-          <button
-            onClick={() => navigate('/admin/users')}
-            className="mt-3 text-sm text-red-500 hover:underline"
-          >
+          <button onClick={() => navigate('/admin/users')} className="mt-3 text-sm text-red-500 hover:underline">
             Manage Users →
           </button>
         </div>
         <div className="bg-white rounded-xl shadow p-6 text-center">
           <p className="text-4xl font-bold text-red-500">{stats.restaurants}</p>
           <p className="text-gray-600 mt-1 font-medium">Restaurants</p>
-          <button
-            onClick={() => navigate('/admin/restaurants')}
-            className="mt-3 text-sm text-red-500 hover:underline"
-          >
+          <button onClick={() => navigate('/admin/restaurants')} className="mt-3 text-sm text-red-500 hover:underline">
             Manage Restaurants →
           </button>
         </div>
         <div className="bg-white rounded-xl shadow p-6 text-center">
           <p className="text-4xl font-bold text-red-500">{stats.orders}</p>
           <p className="text-gray-600 mt-1 font-medium">Total Orders</p>
-          <button
-            onClick={() => navigate('/admin/orders')}
-            className="mt-3 text-sm text-red-500 hover:underline"
-          >
+          <button onClick={() => navigate('/admin/orders')} className="mt-3 text-sm text-red-500 hover:underline">
             Manage Orders →
           </button>
         </div>
@@ -115,7 +102,7 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 text-gray-600">{order.restaurant?.name}</td>
                   <td className="px-6 py-4 text-gray-800 font-semibold">Rs.{order.totalPrice}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(order.status)}`}>
+                    <span className={'px-2 py-1 rounded-full text-xs font-semibold ' + statusColor(order.status)}>
                       {order.status.replace('_', ' ').toUpperCase()}
                     </span>
                   </td>
@@ -132,13 +119,13 @@ const AdminDashboard = () => {
           onClick={() => navigate('/admin/restaurants')}
           className="bg-red-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-red-600 transition"
         >
-          🍽️ Manage Restaurants
+          Manage Restaurants
         </button>
         <button
           onClick={() => navigate('/admin/orders')}
           className="bg-gray-800 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-900 transition"
         >
-          📦 Manage Orders
+          Manage Orders
         </button>
       </div>
     </div>

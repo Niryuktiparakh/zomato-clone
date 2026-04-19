@@ -20,7 +20,7 @@ const ManageOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get('/admin/orders');
+      const res = await api.get('/api/admin/orders');
       setOrders(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -32,7 +32,7 @@ const ManageOrders = () => {
   const handleStatusUpdate = async (orderId, status) => {
     setUpdating(orderId);
     try {
-      await api.put(`/admin/orders/${orderId}/status`, { status });
+      await api.put('/api/admin/orders/' + orderId + '/status', { status });
       fetchOrders();
     } catch (err) {
       alert('Failed to update status');
@@ -59,11 +59,8 @@ const ManageOrders = () => {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Manage Orders</h1>
-        <button
-          onClick={() => navigate('/admin')}
-          className="text-red-500 hover:underline text-sm"
-        >
-          ← Back to Dashboard
+        <button onClick={() => navigate('/admin')} className="text-red-500 hover:underline text-sm">
+          Back to Dashboard
         </button>
       </div>
 
@@ -75,10 +72,11 @@ const ManageOrders = () => {
             <div key={order._id} className="bg-white rounded-xl shadow p-6">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="font-bold text-gray-800">{order.user?.name}
+                  <p className="font-bold text-gray-800">
+                    {order.user?.name}
                     <span className="text-gray-400 font-normal text-sm ml-2">{order.user?.email}</span>
                   </p>
-                  <p className="text-gray-500 text-sm">🍽️ {order.restaurant?.name}</p>
+                  <p className="text-gray-500 text-sm">{order.restaurant?.name}</p>
                   <p className="text-gray-400 text-xs">{new Date(order.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="text-right">
@@ -90,14 +88,14 @@ const ManageOrders = () => {
               <div className="border-t pt-3 mb-3 space-y-1">
                 {order.items.map((item) => (
                   <div key={item._id} className="flex justify-between text-sm text-gray-600">
-                    <span>{item.menuItem?.name} × {item.quantity}</span>
+                    <span>{item.menuItem?.name} x {item.quantity}</span>
                     <span>Rs.{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor(order.status)}`}>
+                <span className={'px-3 py-1 rounded-full text-xs font-semibold ' + statusColor(order.status)}>
                   {order.status.replace('_', ' ').toUpperCase()}
                 </span>
                 <select

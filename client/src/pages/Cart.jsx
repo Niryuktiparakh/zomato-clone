@@ -19,7 +19,7 @@ const Cart = () => {
 
   const handleIncrease = async (menuItemId) => {
     try {
-      await api.post('/cart', { menuItemId, quantity: 1 });
+      await api.post('/api/cart', { menuItemId, quantity: 1 });
       fetchCart();
     } catch (err) {
       console.error(err);
@@ -29,9 +29,9 @@ const Cart = () => {
   const handleDecrease = async (menuItemId, currentQty) => {
     try {
       if (currentQty <= 1) {
-        await api.delete(`/cart/${menuItemId}`);
+        await api.delete('/api/cart/' + menuItemId);
       } else {
-        await api.post('/cart', { menuItemId, quantity: -1 });
+        await api.post('/api/cart', { menuItemId, quantity: -1 });
       }
       fetchCart();
     } catch (err) {

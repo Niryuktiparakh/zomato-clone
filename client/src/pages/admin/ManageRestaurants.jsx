@@ -15,19 +15,10 @@ const ManageRestaurants = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [showMenuForm, setShowMenuForm] = useState(false);
-  const [menuForm, setMenuForm] = useState({
-    name: '', description: '', price: '', category: '',
-  });
+  const [menuForm, setMenuForm] = useState({ name: '', description: '', price: '', category: '' });
   const [form, setForm] = useState({
-    name: '',
-    cuisine: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    pincode: '',
-    openingTime: '09:00',
-    closingTime: '22:00',
+    name: '', cuisine: '', phone: '', street: '', city: '',
+    state: '', pincode: '', openingTime: '09:00', closingTime: '22:00',
   });
 
   useEffect(() => {
@@ -40,7 +31,7 @@ const ManageRestaurants = () => {
 
   const fetchRestaurants = async () => {
     try {
-      const res = await api.get('/admin/restaurants');
+      const res = await api.get('/api/admin/restaurants');
       setRestaurants(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -51,7 +42,7 @@ const ManageRestaurants = () => {
 
   const fetchMenu = async (restaurantId) => {
     try {
-      const res = await api.get(`/menu/${restaurantId}`);
+      const res = await api.get('/api/menu/' + restaurantId);
       setMenuItems(Array.isArray(res.data) ? res.data : []);
       setSelectedRestaurant(restaurantId);
     } catch (err) {
@@ -63,7 +54,7 @@ const ManageRestaurants = () => {
     if (!window.confirm('Are you sure you want to delete this restaurant?')) return;
     setDeleting(id);
     try {
-      await api.delete(`/admin/restaurants/${id}`);
+      await api.delete('/api/admin/restaurants/' + id);
       toast.success('Restaurant deleted successfully!');
       if (selectedRestaurant === id) setSelectedRestaurant(null);
       fetchRestaurants();
@@ -74,30 +65,20 @@ const ManageRestaurants = () => {
     }
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleMenuChange = (e) => {
-    setMenuForm({ ...menuForm, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleMenuChange = (e) => setMenuForm({ ...menuForm, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await api.post('/restaurants', {
+      await api.post('/api/restaurants', {
         name: form.name,
         cuisine: form.cuisine.split(',').map((c) => c.trim()),
         phone: form.phone,
         openingTime: form.openingTime,
         closingTime: form.closingTime,
-        address: {
-          street: form.street,
-          city: form.city,
-          state: form.state,
-          pincode: form.pincode,
-        },
+        address: { street: form.street, city: form.city, state: form.state, pincode: form.pincode },
       });
       toast.success('Restaurant created successfully!');
       setForm({ name: '', cuisine: '', phone: '', street: '', city: '', state: '', pincode: '', openingTime: '09:00', closingTime: '22:00' });
@@ -113,7 +94,7 @@ const ManageRestaurants = () => {
   const handleMenuSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post(`/menu/${selectedRestaurant}`, {
+      await api.post('/api/menu/' + selectedRestaurant, {
         name: menuForm.name,
         description: menuForm.description,
         price: Number(menuForm.price),
@@ -131,7 +112,7 @@ const ManageRestaurants = () => {
   const handleDeleteMenuItem = async (menuItemId) => {
     if (!window.confirm('Delete this menu item?')) return;
     try {
-      await api.delete(`/menu/${menuItemId}`);
+      await api.delete('/api/menu/' + menuItemId);
       toast.success('Menu item deleted!');
       fetchMenu(selectedRestaurant);
     } catch (err) {
@@ -146,17 +127,11 @@ const ManageRestaurants = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Manage Restaurants</h1>
         <div className="flex gap-3">
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-          >
+          <button onClick={() => setShowForm(!showForm)} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
             {showForm ? 'Cancel' : '+ Add Restaurant'}
           </button>
-          <button
-            onClick={() => navigate('/admin')}
-            className="text-red-500 hover:underline text-sm"
-          >
-            ← Dashboard
+          <button onClick={() => navigate('/admin')} className="text-red-500 hover:underline text-sm">
+            Dashboard
           </button>
         </div>
       </div>
@@ -220,11 +195,11 @@ const ManageRestaurants = () => {
                 <p className="text-gray-400 text-sm">{r.address?.city}, {r.address?.state}</p>
                 <div className="flex gap-3 mt-1 flex-wrap">
                   <span className="text-yellow-500 text-sm">⭐ {r.rating}</span>
-                  <span className={`text-sm ${r.isOpen ? 'text-green-500' : 'text-red-400'}`}>
+                  <span className={'text-sm ' + (r.isOpen ? 'text-green-500' : 'text-red-400')}>
                     {r.isOpen ? 'Open' : 'Closed'}
                   </span>
                   {r.openingTime && (
-                    <span className="text-gray-400 text-sm">🕐 {r.openingTime} - {r.closingTime}</span>
+                    <span className="text-gray-400 text-sm">{r.openingTime} - {r.closingTime}</span>
                   )}
                 </div>
               </div>
@@ -257,55 +232,18 @@ const ManageRestaurants = () => {
               <div className="mt-4 border-t pt-4">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold text-gray-700">Menu Items</h3>
-                  <button
-                    onClick={() => setShowMenuForm(!showMenuForm)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition"
-                  >
+                  <button onClick={() => setShowMenuForm(!showMenuForm)} className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition">
                     {showMenuForm ? 'Cancel' : '+ Add Item'}
                   </button>
                 </div>
 
                 {showMenuForm && (
                   <form onSubmit={handleMenuSubmit} className="grid grid-cols-2 gap-3 mb-4">
-                    <input
-                      type="text"
-                      name="name"
-                      value={menuForm.name}
-                      onChange={handleMenuChange}
-                      required
-                      placeholder="Item name"
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                    />
-                    <input
-                      type="text"
-                      name="category"
-                      value={menuForm.category}
-                      onChange={handleMenuChange}
-                      required
-                      placeholder="Category (e.g. Starter)"
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                    />
-                    <input
-                      type="number"
-                      name="price"
-                      value={menuForm.price}
-                      onChange={handleMenuChange}
-                      required
-                      placeholder="Price (₹)"
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                    />
-                    <input
-                      type="text"
-                      name="description"
-                      value={menuForm.description}
-                      onChange={handleMenuChange}
-                      placeholder="Description (optional)"
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                    />
-                    <button
-                      type="submit"
-                      className="col-span-2 bg-red-500 text-white py-2 rounded-lg text-sm hover:bg-red-600 transition"
-                    >
+                    <input type="text" name="name" value={menuForm.name} onChange={handleMenuChange} required placeholder="Item name" className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                    <input type="text" name="category" value={menuForm.category} onChange={handleMenuChange} required placeholder="Category (e.g. Starter)" className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                    <input type="number" name="price" value={menuForm.price} onChange={handleMenuChange} required placeholder="Price" className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                    <input type="text" name="description" value={menuForm.description} onChange={handleMenuChange} placeholder="Description (optional)" className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
+                    <button type="submit" className="col-span-2 bg-red-500 text-white py-2 rounded-lg text-sm hover:bg-red-600 transition">
                       Add Menu Item
                     </button>
                   </form>
@@ -322,10 +260,7 @@ const ManageRestaurants = () => {
                           <p className="text-gray-400 text-xs">{item.category} • ₹{item.price}</p>
                           {item.description && <p className="text-gray-400 text-xs">{item.description}</p>}
                         </div>
-                        <button
-                          onClick={() => handleDeleteMenuItem(item._id)}
-                          className="text-red-400 hover:text-red-600 text-sm"
-                        >
+                        <button onClick={() => handleDeleteMenuItem(item._id)} className="text-red-400 hover:text-red-600 text-sm">
                           Delete
                         </button>
                       </div>

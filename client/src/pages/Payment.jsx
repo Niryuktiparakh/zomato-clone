@@ -62,7 +62,7 @@ function Payment() {
     }
     setPlacing(true);
     try {
-      await api.post('/orders', {
+      await api.post('/api/orders', {
         deliveryAddress,
         paymentMethod: paymentMethod === 'online' ? 'online' : 'cod',
         isPaid: paymentMethod === 'online',
