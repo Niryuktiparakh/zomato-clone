@@ -5,6 +5,20 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 
+const isRestaurantOpen = (openingTime, closingTime) => {
+  if (!openingTime || !closingTime) return true;
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const [openH, openM] = openingTime.split(':').map(Number);
+  const [closeH, closeM] = closingTime.split(':').map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  if (closeMinutes < openMinutes) {
+    return currentMinutes >= openMinutes || currentMinutes < closeMinutes;
+  }
+  return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+};
+
 const RestaurantDetail = () => {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
@@ -37,7 +51,8 @@ const RestaurantDetail = () => {
       toast.error('Please login to add items to cart');
       return;
     }
-    if (!restaurant.isOpen) {
+    const open = isRestaurantOpen(restaurant.openingTime, restaurant.closingTime);
+    if (!open) {
       toast.error('This restaurant is currently closed');
       return;
     }
@@ -71,6 +86,8 @@ const RestaurantDetail = () => {
   if (loading) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
   if (!restaurant) return <p className="text-center mt-10 text-red-500">Restaurant not found.</p>;
 
+  const open = isRestaurantOpen(restaurant.openingTime, restaurant.closingTime);
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="bg-white rounded-xl shadow p-6 mb-8">
@@ -79,14 +96,14 @@ const RestaurantDetail = () => {
         <p className="text-gray-400 text-sm">{restaurant.address?.street}, {restaurant.address?.city}</p>
         <div className="flex items-center gap-4 mt-3 flex-wrap">
           <span className="text-yellow-500 font-semibold">⭐ {restaurant.rating || '0.0'}</span>
-          <span className={`text-sm font-medium ${restaurant.isOpen ? 'text-green-500' : 'text-red-400'}`}>
-            {restaurant.isOpen ? '🟢 Open Now' : '🔴 Closed Now'}
+          <span className={'text-sm font-medium ' + (open ? 'text-green-500' : 'text-red-400')}>
+            {open ? '🟢 Open Now' : '🔴 Closed Now'}
           </span>
           <span className="text-gray-400 text-sm">
             🕐 {restaurant.openingTime} - {restaurant.closingTime}
           </span>
         </div>
-        {!restaurant.isOpen && (
+        {!open && (
           <div className="mt-3 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-red-500 text-sm">
             This restaurant is currently closed. Opens at {restaurant.openingTime}.
           </div>
@@ -108,10 +125,10 @@ const RestaurantDetail = () => {
               </div>
               <button
                 onClick={() => handleAddToCart(item._id)}
-                disabled={addingItem === item._id || !restaurant.isOpen}
+                disabled={addingItem === item._id || !open}
                 className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {!restaurant.isOpen ? 'Closed' : addingItem === item._id ? 'Adding...' : '+ Add'}
+                {!open ? 'Closed' : addingItem === item._id ? 'Adding...' : '+ Add'}
               </button>
             </div>
           ))}
